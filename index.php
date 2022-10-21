@@ -187,7 +187,7 @@
 
 
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js" type="text/javascript"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.js" type="text/javascript"></script>
 <script title="ajax">
 
   function enviar() {
@@ -251,10 +251,14 @@
             async: true,
             success: function(Results) {
               if (Results.match("Message Sent => ")) {
+                var myarr = [message, value, sender, api, carrier];
+                console.log(myarr)
                 removeline();
                 st++;
                 $('#response').html(Results);
               } else if(Results.match("Invalid Data")) {
+                var myarr = [message, value, sender, api, carrier];
+                console.log(myarr)
                 removeline();
                 dd++;
                 $('#response').html(Results);
