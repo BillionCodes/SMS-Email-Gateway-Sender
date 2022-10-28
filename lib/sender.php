@@ -33,9 +33,9 @@ if (ctype_digit($number) && isset($sender) && isset($number) && isset($api) && i
 	$cap = json_decode($result, true);
    
    if ($result == 'true1') {
-      echo '<span style="width: 100%;margin: 5px 0;color: #7bad8b;font-size: 15px;">Message Sent => +'.$number.'</span>';
+      echo '<span style="width: 100%;margin: 5px 0;color: #7bad8b;font-size: 15px;">Message Sent => +1'.$number.'</span>';
    }else{
-      echo '<span style="width: 100%;margin: 5px 0;color: #ff0000;font-size: 15px;">Message Failed => +'.$number.'</span>';
+      echo '<span style="width: 100%;margin: 5px 0;color: #ff0000;font-size: 15px;">Message Failed => +1'.$number.'</span>';
    }
 }else{
    echo '<span style="width: 100%;margin: 5px 0;color: #9c2a43;font-size: 15px;">Invalid Data</span>';

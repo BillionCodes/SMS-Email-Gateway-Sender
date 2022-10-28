@@ -1,12 +1,14 @@
 
 <html>
 <head>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="never">
   <link href="assets/img/favicon.png" rel="icon">
   <title>SMS CLIENT | Billioncodes</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -33,6 +35,54 @@
         </div>
         <label>Message</label>
         <textarea placeholder="Message" id="message"></textarea>
+        <button type="button" class="btn btn-primary btn-lg show-modal" data-toggle="modal" data-target="#myModal">
+                  Config SMTP
+                </button>
+ 
+                <!-- Modal -->
+                <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content clearfix">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                            <div class="modal-body">
+                                <h3 class="title">SMTP Config Form</h3>
+                                <p class="description">Enter config details here</p>
+                                <div id="smtpresponse"></div>
+                                <div class="form-group">
+                                    <span class="input-icon"><i class="fa fa-link"></i></span>
+                                    <input type="url" class="form-control" placeholder="API" id="smtpapi">
+                                </div>
+                                <div class="form-group">
+                                  <button onclick="testsmtp()">TEST</button>
+                                  <span id="Modalapi">RESULT</span>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-icon"><i class="fa fa-user"></i></span>
+                                    <input class="form-control" placeholder="Enter Hostname" id="host">
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-icon"><i class="fa fa-plug"></i></span>
+                                    <input type="number" class="form-control" placeholder="Port" id="port">
+                                </div>
+                                <div class="form-group checkbox">
+                                    <input type="checkbox" id="secureConnection">
+                                    <label>Enable SSL</label>
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-icon"><i class="fa fa-envelope"></i></span>
+                                    <input class="form-control" placeholder="Username e.g email@domain.com" id="username">
+                                </div>
+                                <div class="form-group">
+                                    <span class="input-icon"><i class="fa fa-key"></i></span>
+                                    <input type="password" class="form-control" placeholder="Password" id="password">
+                                </div>
+                                
+                                <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.0.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+                                <button class="btn" onclick="configSmtp()">SET</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
         <label>SENDER SERVER</label>
         <div class="skbox">
@@ -181,6 +231,7 @@
 
         <label>Numbers</label>
         <textarea placeholder="Numbers" id="numbers"></textarea>
+        
         <input type="submit" onmousedown="enviar();" value="Send SMS now!">
     </div>
 </div>
@@ -286,6 +337,42 @@
     $("#numbers").val(lines.join("\n"));
   }
 </script>
+<script type="text/javascript"> 
+  function configSmtp() {
+    var smtp = $("#smtpapi").val();
+    var host = $("#host").val();
+    var port = $("#port").val();
+    var username = $("#username").val();
+    console.log(username);
+    var password = $("#password").val();
+    var secureConnection = $("#secureConnection").is(":checked");
+    var data  = {"host":host,"port":port,"user":username,"password":password,"ssl":secureConnection, "smtp":smtp};
+    console.log(data);
+    //if($('#secureConnection').prop('checked')){ secureConnection = 1; }else{ secureConnection = 0; }
+    setTimeout(
+        function(){
+            $.ajax({
+            url: 'lib/smtpconfig.php',
+            type: 'GET',
+            data: (data),
+            async: true,
+            beforeSend: function () {
+                $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
+            },
+            success: function(data){
+                if (data.match("FAILED")) {
+                    $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
+                }else if(data.match("SUCCESS")){
+                    $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">SUCCESS</span>');
+                }else {
+                    $('#smtpresponse').html('<span style="color: #5f785f;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">'+ data +'</span>');
+                }
+            }
+        });
+    }, 2000);
+  }
+</script>
+
 <script type="text/javascript">
     function checkapi(){
     var api = $("#api").val();
