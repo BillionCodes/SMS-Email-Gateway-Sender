@@ -12,7 +12,7 @@ function processText($text) {
     return $text;
 }
 function generateText($message) {
-    $open_ai_key = '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';//getenv('OPENAI_API_KEY');
+    $open_ai_key = getenv('OPENAI_API_KEY');
     $open_ai = new OpenAi($open_ai_key);
     if (isset($message)) { 
         $message = processText($message);
