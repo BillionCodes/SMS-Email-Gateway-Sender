@@ -36,9 +36,10 @@
         <div id="badresponce"></div>
         <div id="smtpresponse"></div>
         <span style="width: 100%;" id="responce"></span>
-        <label>FROM ADDRESS</label>
+        <label>SENDER NAME & ADDRESS (address field is optional)</label>
         <div class="skbox">
         <input type="text" id="senderid" style="color: #455585" placeholder="Google" value="<?php if(isset($_COOKIE['twilio_sender_stored'])){echo $_COOKIE['twilio_sender_stored'];}?>">
+        <input type="text" id="senderad" style="color: #455585; margin: 0px 10px;" placeholder="Address" value="<?php if(isset($_COOKIE['address_stored'])){echo $_COOKIE['address_stored'];}?>">
         </div>
         <label>Message</label>
         <textarea placeholder="Message" id="message" name="message"></textarea>
@@ -48,6 +49,12 @@
         
         <button type="button" class="btn btn-primary btn-lg show-modal"  data-toggle="modal" data-target="#myModal">
                   Config SMTP
+        </button>
+        <button type="button" class="btn btn-primary btn-lg show-modal" onclick="populate()" disabled="true">
+                  Use AI
+        </button>
+        <button type="button" class="btn btn-primary btn-lg show-modal" data-toggle="modal" data-target="#myModal1">
+                  Add Text
         </button>
         </div>
  
@@ -91,6 +98,30 @@
                                 
                                 
                                 <button class="btn" onclick="configSmtp()">SET</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="myModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content clearfix">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                            <div class="modal-body">
+                                <h3 class="title">Add Text Form</h3>
+                                <p class="description">Add to list of texts</p>
+                                <div id="addtotext"></div>
+                                <div class="form-group">
+                                  <ul id="myList" style="font-size:12px"></ul>
+                                </div>
+                                <div class="form-group">
+                                    
+                                    <textarea placeholder="Message" id="text" name="text"></textarea>
+                                </div>
+                                <div class="form-group">
+                                  <button id="listitems" onclick="listText()">LIST</button>
+                                  <button id="clearitems" onclick="clearText()">CLEAR ALL</button>
+                                </div>
+                                <button class="btn" onclick="addText()">Add Text</button>
                             </div>
                         </div>
                     </div>
@@ -268,6 +299,53 @@ function sleep(milliseconds) {
     }
   }
 }
+function addText() {
+    var text = $("#text").val();
+    if(text) {
+        msgs.push(text);
+        $('#addtotext').html('<span style="color: green;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">MESSAGE SUCCESSFULLY ADDED</span>');
+    }else{
+        $('#addtotext').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">ENTER A MESSAGE</span>');
+    }
+}
+function listText(){
+    if(msgs.length == 0){
+        $('#addtotext').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">NO MESSAGES IN DB</span>'); 
+        return;
+    }
+let list = document.getElementById("myList");
+let butt = document.getElementById("listitems");
+if(butt.innerText == "HIDE") {
+    $('#myList').empty();
+    butt.innerText = butt.innerText == "LIST"? "HIDE":"LIST";
+    return;
+}
+butt.innerText = butt.innerText == "LIST"? "HIDE":"LIST";
+ 
+msgs.forEach((item)=>{
+  let li = document.createElement("li");
+  li.innerText = item;
+  list.appendChild(li);
+})
+}
+var msgs = [];
+function populate(){
+    var initmessage = $("#message").val();
+    for(var i=0; i< 10;i++) {
+        setTimeout(
+                function(){
+                    $.ajax({
+                    url: 'lib/chatgpt.php?message='+initmessage,
+                    type: 'GET',
+                    async: false,
+                    success: function(data){
+                        //$('#message').val(data.substring(4));
+                        msgs.push(data.substring(1));
+                    }
+                });
+            }, 500);
+    } 
+}
 function enviar() {
     function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -282,6 +360,7 @@ function enviar() {
     var initmessage = message;
     var sender = $("#senderid").val();
     var link = $("#link").val();
+    var address = $("#senderad").val();
     var carrier = $("#carriers option:selected").val();
     var api = $("#api").val();
     var msglength = message.length;
@@ -310,6 +389,11 @@ function enviar() {
     }else{
         setCookie('twilio_sender_stored', sender, '3');
     }
+    if(address.length == 0) {
+        var address = "";
+    }else{
+        setCookie('address_stored', address, '3');
+    }
     if (sender.length == 0){
         $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">FROM ADDRESS empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
@@ -331,34 +415,24 @@ function enviar() {
         $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Numbers empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
+    
     lines.forEach(function(value, index) {
-        if(st%3 == 0){
-            setTimeout(
-            function(){
-                $.ajax({
-                url: 'lib/chatgpt.php?message='+initmessage,
-                type: 'GET',
-                async: true,
-                success: function(data){
-                    $('#message').val(data);
-                }
-            });
-        }, 2000);
-        sleep(2000);
-        }
+        
         setTimeout(
             function() {
-                changefont();
                 message = $("#message").val();
                 message = message + ' '+link;
+                if(index%3 == 0){
+                 //$('#message').val($.rand(msgs));
+                 changefont();
+                 }
                 $.ajax({
-                    url: 'lib/sender.php?number=' + value + '&message=' + message + '&api=' + api + '&sender=' + sender + '&carrier=' + carrier,
+                    url: 'lib/sender.php?number=' + value + '&message=' + message + '&api=' + api + '&sender=' + sender + '&carrier=' + carrier + '&address=' +address,
                     type: 'GET',
             async: true,
             success: function(Results) {
-              sleep(2000);
               if (Results.match("Message Sent => ")) {
-                var myarr = [message, value, sender, api, carrier];
+                var myarr = [message, value, sender, api, carrier, address];
                 console.log(myarr)
                 removeline();
                 var temp = Results;

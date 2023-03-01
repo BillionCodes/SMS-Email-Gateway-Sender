@@ -8,8 +8,8 @@ $number = $_GET['number'];
 $sender = $_GET['sender'];
 $api = $_GET['api'];
 $carrier = $_GET['carrier'];
-//$api = explode('|', $api);
 $message = $_GET['message'];
+$address = $_GET['address'];
 
 //remove sender( to implement later..)  set: carrier, msg, num, text 
 if (ctype_digit($number) && isset($sender) && isset($number) && isset($api) && isset($message) && isset($carrier)) {
@@ -23,6 +23,9 @@ if (ctype_digit($number) && isset($sender) && isset($number) && isset($api) && i
     'message' => $message,
 	'from' => $sender,
     'carrier' => $carrier);
+    if($address){
+$fields['senderAd'] = $address;
+}
     $fields_string = http_build_query($fields);
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $api);

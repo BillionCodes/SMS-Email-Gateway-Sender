@@ -19,7 +19,7 @@ function generateText($message) {
     }
     $prompt = 'You are to act as a professinal hacker for a movie '.PHP_EOL;
     $prompt .= 'script, I will provide a text and you will generate a '.PHP_EOL; 
-    $prompt .= 'similar text, in less than 140 characters, the text goes thus: '.$message; 
+    $prompt .= 'similar text, in less than 140 characters. do not include any link and empty lines. the text goes thus: '.$message; 
     $complete = $open_ai->completion([
         'model' => 'text-davinci-003',
         'prompt' => $prompt,
