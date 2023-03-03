@@ -429,10 +429,12 @@ function enviar() {
         
         setTimeout(
             function() {
+                if(msgs.length > 1) {
+                    $('#message').val($.rand(msgs));
+                }
                 message = $("#message").val();
                 message = message + ' '+link;
                 if(index%3 == 0){
-                 //$('#message').val($.rand(msgs));
                  changefont();
                  }
                 $.ajax({
