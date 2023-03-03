@@ -66,7 +66,7 @@
                             <div class="modal-body">
                                 <h3 class="title">SMTP Config Form</h3>
                                 <p class="description">Enter config details here</p>
-                                <div id="smtpresponse"></div>
+                                <div id="smtpapiresponse"></div>
                                 <div class="form-group">
                                     <span class="input-icon"><i class="fa fa-link"></i></span>
                                     <input type="url" class="form-control" placeholder="API" id="smtpapi">
@@ -109,7 +109,7 @@
                             <div class="modal-body">
                                 <h3 class="title">Add Text Form</h3>
                                 <p class="description">Add to list of texts</p>
-                                <div id="addtotext"></div>
+                                <div id="addtotext" style="font-size:12px"></div>
                                 <div class="form-group">
                                   <ul id="myList" style="font-size:12px"></ul>
                                 </div>
@@ -303,19 +303,20 @@ function addText() {
     var text = $("#text").val();
     if(text) {
         msgs.push(text);
-        $('#addtotext').html('<span style="color: green;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">MESSAGE SUCCESSFULLY ADDED</span>');
+        $('#addtotext').html('<span style="color: green;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">MESSAGE SUCCESSFULLY ADDED</span>');
     }else{
-        $('#addtotext').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">ENTER A MESSAGE</span>');
+        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">ENTER A MESSAGE</span>');
     }
 }
 function listText(){
     if(msgs.length == 0){
-        $('#addtotext').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">NO MESSAGES IN DB</span>'); 
+        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">NO MESSAGES IN DB</span>'); 
         return;
     }
 let list = document.getElementById("myList");
 let butt = document.getElementById("listitems");
 if(butt.innerText == "HIDE") {
+    $("#addtotext").remove();
     $('#myList').empty();
     butt.innerText = butt.innerText == "LIST"? "HIDE":"LIST";
     return;
@@ -329,6 +330,14 @@ msgs.forEach((item)=>{
 })
 }
 var msgs = [];
+function clearText(){
+    if(msgs.length  > 0) {
+        msgs = [];
+        $('#myList').empty();
+        document.getElementById("listitems").innerText = "LIST";
+        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">CLEARED</span>'); 
+    }
+}
 function populate(){
     var initmessage = $("#message").val();
     for(var i=0; i< 10;i++) {
@@ -395,7 +404,7 @@ function enviar() {
         setCookie('address_stored', address, '3');
     }
     if (sender.length == 0){
-        $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">FROM ADDRESS empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Sender name empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
     if (message.length == 0){
@@ -408,7 +417,7 @@ function enviar() {
     }
     
     if (api.length == 0){
-        $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Sender server.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        $('#responce').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Sender server empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
     if (numbers.length == 0){
@@ -486,6 +495,27 @@ function enviar() {
     var secureConnection = $("#secureConnection").is(":checked");
     var data  = {"host":host,"port":port,"user":username,"password":password,"ssl":secureConnection, "smtp":smtp};
     console.log(data);
+    if (password.length == 0){
+        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Password empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        return;
+    }
+    if (smtp.length == 0){
+        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">SMTP config api empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        return;
+    }
+    if (host.length == 0){
+        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Host empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        return;
+    }
+    
+    if (port != '25' || port != 465 || port != 587){
+        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Port number.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        return;
+    }
+    if (username.length == 0){
+        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Username empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+        return;
+    }
     //if($('#secureConnection').prop('checked')){ secureConnection = 1; }else{ secureConnection = 0; }
     setTimeout(
         function(){
@@ -495,15 +525,15 @@ function enviar() {
             data: (data),
             async: true,
             beforeSend: function () {
-                $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
+                $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">CONFIGURING</span>');
             },
             success: function(data){
                 if (data.match("FAILED")) {
-                    $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
+                    $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
                 }else if(data.match("SUCCESS")){
-                    $('#smtpresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">SUCCESS</span>');
+                    $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">SUCCESS</span>');
                 }else {
-                    $('#smtpresponse').html('<span style="color: #5f785f;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">'+ data +'</span>');
+                    $('#smtpapiresponse').html('<span style="color: #5f785f;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">'+ data +'</span>');
                 }
             }
         });
