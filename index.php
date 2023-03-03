@@ -508,7 +508,7 @@ function enviar() {
         return;
     }
     
-    if (port != '25' || port != 465 || port != 587){
+    if (port != '25' || port != '465' || port != '587'){
         $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Port number.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
