@@ -50,9 +50,9 @@
         <button type="button" class="btn btn-primary btn-lg show-modal"  data-toggle="modal" data-target="#myModal">
                   Config SMTP
         </button>
-        <button type="button" class="btn btn-primary btn-lg show-modal" onclick="populate()" disabled="true">
+        <!-- <button type="button" class="btn btn-primary btn-lg show-modal" onclick="populate()" disabled="true">
                   Use AI
-        </button>
+        </button> -->
         <button type="button" class="btn btn-primary btn-lg show-modal" data-toggle="modal" data-target="#myModal1">
                   Add Text
         </button>
