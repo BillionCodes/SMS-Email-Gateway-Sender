@@ -4,19 +4,19 @@ error_reporting(0);
 require 'vendor/autoload.php';
 use Twilio\Rest\Client;
 
-$host = $_GET['host'];
-$port = $_GET['port'];
+// $host = $_GET['host'];
+// $port = $_GET['port'];
+$service = $_GET['service'];
 $api = $_GET['smtp'];
 $user = $_GET['user'];
 $pass = $_GET['password'];
 $ssl = $_GET['ssl'];
 
 //remove sender( to implement later..)  set: carrier, msg, num, text 
-if (ctype_digit($port) && isset($host) && isset($port) && isset($api) && isset($user) && isset($ssl)) {
+if (isset($service) && isset($api) && isset($user) && isset($ssl)) {
    
    $fields = array(
-    'host' => $host,
-    'port' => $port,
+    'service' => $service,
 	'user' => $user,
     'pass' => $pass,
     'secureConnection' => $ssl

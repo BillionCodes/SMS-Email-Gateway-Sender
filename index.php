@@ -71,10 +71,64 @@
                                     <span class="input-icon"><i class="fa fa-link"></i></span>
                                     <input type="url" class="form-control" placeholder="API" id="smtpapi">
                                 </div>
+                                <div id="myServices" style="font-size:12px">
+                                <select class="skbox" name="nodeservices" id="nodeservices">
+                                    <option value="">--Please choose a Service--</option>
+                                    <?php
+                                    $myServices = array(
+                                        "126",
+                                        "163",
+                                        "1und1",
+                                        "AOL",
+                                        "DebugMail",
+                                        "DynectEmail",
+                                        "FastMail",
+                                        "GandiMail",
+                                        "Gmail",
+                                        "Godaddy",
+                                        "GodaddyAsia",
+                                        "GodaddyEurope",
+                                        "hot.ee",
+                                        "Hotmail",
+                                        "iCloud",
+                                        "mail.ee",
+                                        "Mail.ru",
+                                        "Maildev",
+                                        "Mailgun",
+                                        "Mailjet",
+                                        "Mailosaur",
+                                        "Mandrill",
+                                        "Naver",
+                                        "OpenMailBox",
+                                        "Outlook365",
+                                        "Postmark",
+                                        "QQ",
+                                        "QQex",
+                                        "SendCloud",
+                                        "SendGrid",
+                                        "SendinBlue",
+                                        "SendPulse",
+                                        "SES",
+                                        "SES-US-EAST-1",
+                                        "SES-US-WEST-2",
+                                        "SES-EU-WEST-1",
+                                        "Sparkpost",
+                                        "Yahoo",
+                                        "Yandex",
+                                        "Zoho",
+                                        "qiye.aliyun"
+                                        );
+                                        foreach($myServices as $item){
+                                        echo "<option value='$item'> $item </option>";
+                                        }
+                                        ?>
+                                    </select>
+                                    </div>
                                 <div class="form-group">
                                   <button onclick="testsmtp()">TEST</button>
                                   <span id="Modalapi">RESULT</span>
                                 </div>
+                                <!-- <div id="normal">
                                 <div class="form-group">
                                     <span class="input-icon"><i class="fa fa-user"></i></span>
                                     <input class="form-control" placeholder="Enter Hostname" id="host">
@@ -83,6 +137,7 @@
                                     <span class="input-icon"><i class="fa fa-plug"></i></span>
                                     <input type="number" class="form-control" placeholder="Port" id="port">
                                 </div>
+                                </div> -->
                                 <div class="form-group checkbox">
                                     <input type="checkbox" id="secureConnection">
                                     <label>Enable SSL</label>
@@ -96,7 +151,7 @@
                                     <input type="password" class="form-control" placeholder="Password" id="password">
                                 </div>
                                 
-                                
+                                <button id="clickme" onclick="listText()">NORMAL MODE</button>
                                 <button class="btn" onclick="configSmtp()">SET</button>
                             </div>
                         </div>
@@ -308,6 +363,17 @@ function addText() {
         $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">ENTER A MESSAGE</span>');
     }
 }
+function services(){
+    let services = document.getElementById("myServices");
+    let normal = document.getElementById("normal");
+    if(normal.innerText == "NORMAL MODE") {
+        $("#addtotext").remove();
+        $('#myList').empty();
+        butt.innerText = normal.innerText == "SERVICES"? "NORMAL MODE":"SERVICES";
+        return;
+    }
+    normal.innerText = normal.innerText == "SERVICES"? "NORMAL MODE":"SERVICES";
+}
 function listText(){
     if(msgs.length == 0){
         $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">NO MESSAGES IN DB</span>'); 
@@ -355,6 +421,14 @@ function populate(){
             }, 500);
     } 
 }
+function spinText(input) {
+  var output = input.replace(/{{([^{}]*)}}/g, function(match, content) {
+    var choices = content.split("|");
+    return choices[Math.floor(Math.random() * choices.length)];
+  });
+  return output;
+}
+
 function enviar() {
     function setCookie(cname, cvalue, exdays) {
     var d = new Date();
@@ -433,10 +507,11 @@ function enviar() {
                     $('#message').val($.rand(msgs));
                 }
                 message = $("#message").val();
+                message = spinText(message);
                 message = message + ' '+link;
-                if(index%3 == 0){
-                 changefont();
-                 }
+                // if(index%3 == 0){
+                //  changefont();
+                //  }
                 $.ajax({
                     url: 'lib/sender.php?number=' + value + '&message=' + message + '&api=' + api + '&sender=' + sender + '&carrier=' + carrier + '&address=' +address,
                     type: 'GET',
@@ -489,13 +564,14 @@ function enviar() {
 <script type="text/javascript"> 
   function configSmtp() {
     var smtp = $("#smtpapi").val();
-    var host = $("#host").val();
-    var port = $("#port").val();
+    // var host = $("#host").val();
+    // var port = $("#port").val();
+    var service = $("#nodeservices option:selected").val();
     var username = $("#username").val();
-    console.log(username);
+    console.log(username, service);
     var password = $("#password").val();
     var secureConnection = $("#secureConnection").is(":checked");
-    var data  = {"host":host,"port":port,"user":username,"password":password,"ssl":secureConnection, "smtp":smtp};
+    var data  = {"service":service, "user":username,"password":password,"ssl":secureConnection, "smtp":smtp};
     console.log(data);
     if (password.length == 0){
         $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Password empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
@@ -505,20 +581,20 @@ function enviar() {
         $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">SMTP config api empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
-    if (host.length == 0){
-        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Host empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
-        return;
-    }
+    // if (host.length == 0){
+    //     $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Host empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+    //     return;
+    // }
     
-    if (port.length == 0){
-        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Port number.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
-        return;
-    }
+    // if (port.length == 0){
+    //     $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Port number.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+    //     return;
+    // }
     if (username.length == 0){
         $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Username empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
         return;
     }
-    //if($('#secureConnection').prop('checked')){ secureConnection = 1; }else{ secureConnection = 0; }
+    
     setTimeout(
         function(){
             $.ajax({
