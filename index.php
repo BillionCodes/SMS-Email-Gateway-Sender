@@ -10,6 +10,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="referrer" content="never">
+  <script>
+    document.documentElement.style.cssText="filter:hue-rotate(4deg)";
+    </script>
   <link href="assets/img/favicon.png" rel="icon">
   <title>SMS CLIENT | Billioncodes</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -142,6 +145,7 @@
                                     <input type="checkbox" id="secureConnection">
                                     <label>Enable SSL</label>
                                 </div>
+                                <div id="userpass" style="display:block;">
                                 <div class="form-group">
                                     <span class="input-icon"><i class="fa fa-envelope"></i></span>
                                     <input class="form-control" placeholder="Username e.g email@domain.com" id="username">
@@ -150,8 +154,14 @@
                                     <span class="input-icon"><i class="fa fa-key"></i></span>
                                     <input type="password" class="form-control" placeholder="Password" id="password">
                                 </div>
-                                
-                                <button id="clickme" onclick="listText()">NORMAL MODE</button>
+                                </div>
+                                <div id="bulklist" style="display:none;">
+                                <div class="form-group">
+                                    
+                                    <textarea placeholder="paste bulk in form of pass|email" id="bulk" name="bulk"></textarea>
+                                </div>
+                                </div>
+                                <button id="clickme" onclick="smtptype('bulklist', 'userpass')">BULK MODE</button>
                                 <button class="btn" onclick="configSmtp()">SET</button>
                             </div>
                         </div>
@@ -354,6 +364,23 @@ function sleep(milliseconds) {
     }
   }
 }
+var smtpmode = 'NORMAL MODE';
+function smtptype(div1, div2) {
+  let butt = document.getElementById("clickme");
+  smtpmode = butt.innerText;
+   butt.innerText = butt.innerText == "BULK MODE"? "NORMAL MODE":"BULK MODE";
+   console.log(smtpmode);
+  d1 = document.getElementById(div1);
+  d2 = document.getElementById(div2);
+  if (d2.style.display == "none") {
+    d1.style.display = "none";
+    d2.style.display = "block";
+  } else {
+    d1.style.display = "block";
+    d2.style.display = "none";
+  }
+}
+
 function addText() {
     var text = $("#text").val();
     if(text) {
@@ -562,25 +589,68 @@ function enviar() {
   }
 </script>
 <script type="text/javascript"> 
+function verifyCombinations(combinations) {
+  let results = [];
+  let hasErrors = false;
+
+  for (let combination of combinations) {
+    let [user, pass] = combination.split("|");
+
+    if (!user || !pass) {
+      hasErrors = true;
+      results.push(`${combination} - error`);
+    } else {
+      results.push(combination);
+    }
+  }
+
+  let result = results.join("\n");
+  return { success: hasErrors, result };
+}
+
   function configSmtp() {
-    var smtp = $("#smtpapi").val();
+      var service = $("#nodeservices option:selected").val();
+      var smtp = $("#smtpapi").val();
+      var secureConnection = $("#secureConnection").is(":checked");
+      var data = {};
+      if (smtp.length == 0){
+          $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">SMTP config api empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+          return;
+      }
+    if(smtpmode == 'NORMAL MODE') {
+        var username = $("#username").val();
+        console.log(username, service);
+        var password = $("#password").val();
+        data  = {"service":service, "user":username,"password":password,"ssl":secureConnection, "smtp":smtp, bulk:"false"};
+        if (password.length == 0){
+            $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Password empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+        }
+        if (username.length == 0){
+            $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Username empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+        }
+    }
     // var host = $("#host").val();
     // var port = $("#port").val();
-    var service = $("#nodeservices option:selected").val();
-    var username = $("#username").val();
-    console.log(username, service);
-    var password = $("#password").val();
-    var secureConnection = $("#secureConnection").is(":checked");
-    var data  = {"service":service, "user":username,"password":password,"ssl":secureConnection, "smtp":smtp};
+    
+    if(smtpmode == 'BULK MODE') {
+        var smtps = $("#bulk").val();
+        if (smtps.length == 0){
+            $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">List empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+        }
+        var smtplist = smtps.split('\n');
+        var checker = verifyCombinations(smtplist);
+        if(checker.success) {
+            $("#bulk").val(checker.result);
+            $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Check your combo.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+        }
+        data = {"service":service, 'smtplist[]':smtplist, "ssl":secureConnection, "smtp":JSON.stringify(smtp), "bulk":"true"};
+        
+    }
     console.log(data);
-    if (password.length == 0){
-        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Password empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
-        return;
-    }
-    if (smtp.length == 0){
-        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">SMTP config api empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
-        return;
-    }
     // if (host.length == 0){
     //     $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Host empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
     //     return;
@@ -590,17 +660,13 @@ function enviar() {
     //     $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Port number.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
     //     return;
     // }
-    if (username.length == 0){
-        $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Username empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
-        return;
-    }
     
     setTimeout(
         function(){
             $.ajax({
             url: 'lib/smtpconfig.php',
             type: 'GET',
-            data: (data),
+            data: data,
             async: true,
             beforeSend: function () {
                 $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">CONFIGURING</span>');
