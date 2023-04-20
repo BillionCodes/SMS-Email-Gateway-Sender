@@ -39,7 +39,6 @@ if(isset($api) && isset($service)){
     }
     //$fields_string = http_build_query($fields);
     $fields_string = json_encode($fields);
-    error_log(print_r($fields_string, true), 0);
 	$ch = curl_init();
     curl_setopt($ch, CURLOPT_URL, $api);
 	curl_setopt($ch, CURLOPT_POST, TRUE);
@@ -47,14 +46,11 @@ if(isset($api) && isset($service)){
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
     $result = curl_exec($ch); // get boolean result 
-    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $myerr = curl_error($ch);
-    error_log(print_r($myerr, true), 0);
 	curl_close($ch);
-    
 	$cap = json_decode($result, true);
+    error_log(print_r($cap, true), 0);
    
-   if ($result == 'true1') {
+   if ($cap == '1') {
       echo "SUCCESS";
    }else{
       echo "FAILED";

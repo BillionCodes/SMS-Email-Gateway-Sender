@@ -647,7 +647,7 @@ function verifyCombinations(combinations) {
             $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Check your combo.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
             return;
         }
-        data = {"service":service, 'smtplist[]':smtplist, "ssl":secureConnection, "smtp":JSON.stringify(smtp), "bulk":"true"};
+        data = {"service":service, 'smtplist[]':smtplist, "ssl":secureConnection, "smtp":smtp, "bulk":"true"};
         
     }
     console.log(data);
@@ -666,7 +666,7 @@ function verifyCombinations(combinations) {
             $.ajax({
             url: 'lib/smtpconfig.php',
             type: 'GET',
-            data: data,
+            data:(data),
             async: true,
             beforeSend: function () {
                 $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">CONFIGURING</span>');
