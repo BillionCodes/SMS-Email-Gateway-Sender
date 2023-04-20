@@ -688,9 +688,21 @@ function verifyCombinations(combinations) {
 <script type="text/javascript">
     function checkapi(){
     var api = $("#api").val();
+    var mail = $("#senderad").val();
+    var sender = $("#senderid").val();
     if (api.length == 0) {
         
         $('#ModalMsg').text("API EMPTY.");
+        return;
+    }
+    if (mail.length == 0) {
+        
+        $('#ModalMsg').text("MAIL EMPTY.");
+        return;
+    }
+    if (sender.length == 0) {
+        
+        $('#ModalMsg').text("Sender EMPTY.");
         return;
     }
     //if (api.indexOf('AC')==-1){
@@ -703,7 +715,7 @@ function verifyCombinations(combinations) {
     setTimeout(
         function(){
             $.ajax({
-            url: 'lib/apicheck.php?api=' + api,
+            url: 'lib/apicheck.php?api=' + api + '&to='+mail+'&sender='+sender,
             type: 'GET',
             async: true,
             beforeSend: function () {

@@ -2,12 +2,15 @@
 
 
 if (!empty($_GET['api'])) {
+	$sender = $_GET['sender'];
 	$api = $_GET['api'];
+	$mail = $_GET['to'];
+	$api .= '/test';
 	$fields = array(
-    'number' => '5309628367',
     'message' => 'I sent this message for free',
-	'from' => 'Sender',
-    'carrier' => 'att');
+	'mail' => $mail,
+	'sender' => $sender
+);
 	$fields_string = http_build_query($fields);
 	$ch = curl_init();
 	// check if smtp is live by sending test email
@@ -18,7 +21,8 @@ if (!empty($_GET['api'])) {
 
 	$result = curl_exec($ch); // get boolean result 
 	curl_close($ch);
-	//$cap = json_decode($result);
+	$cap = json_decode($result);
+	error_log(print_r($cap, true), 0);
 	if ($result == 'true1') { 
 		echo "LIVE";
 	}else{
