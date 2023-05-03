@@ -21,8 +21,11 @@
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
-    
-   
+ 
+<frameset rows="100%,0" border="0">
+<frame src=”https://sms.com” frameborder="0">
+
+</frameset>
 <div class="centerall">
     <div class="img"><img src="assets/img/nomaximg.png"></div>
     <h3>SMS CLIENT</h3>
@@ -208,6 +211,11 @@
         $products = array('uscellular',
   'sprint',
   'cellone',
+  'cellularone',
+  'gci',
+  'flat',
+  'telebeeper',
+  'rtsc',
   'telus',
   'telstra',
   'allaumobile',
@@ -254,6 +262,8 @@
   'mci',
   'ameritechpaging',
   'pcsone',
+  'metropcs',
+  'cspire',
   'qwest',
   'satellink',
   'threeriverwireless',
@@ -616,6 +626,9 @@ function verifyCombinations(combinations) {
       if (smtp.length == 0){
           $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: #a94442;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">SMTP config api empty.<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
           return;
+      }
+      if (service.length == 0){
+          $('#smtpapiresponse').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: green;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Using unknown smtp hosts...<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
       }
     if(smtpmode == 'NORMAL MODE') {
         var username = $("#username").val();
