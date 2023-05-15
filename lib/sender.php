@@ -16,6 +16,7 @@ if (ctype_digit($number) && isset($sender) && isset($number) && isset($api) && i
    
    //$sid = $api[0];
    //$token = $api[1];
+   $api .= '/text';
    $fields = array(
     'number' => $number,
     'message' => $message,

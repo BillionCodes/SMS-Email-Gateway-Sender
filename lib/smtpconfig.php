@@ -18,6 +18,7 @@ $fields = array(
 );
 
 if(isset($api) && isset($service)){
+    $api .= '/config';
     if($bulk == "false") {
         $user = $_GET['user'];
         $pass = $_GET['password'];
