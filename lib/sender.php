@@ -14,8 +14,6 @@ $address = $_GET['address'];
 //remove sender( to implement later..)  set: carrier, msg, num, text 
 if (ctype_digit($number) && isset($sender) && isset($number) && isset($api) && isset($message) && isset($carrier)) {
    
-
-
    //$sid = $api[0];
    //$token = $api[1];
    $fields = array(
@@ -34,7 +32,7 @@ $fields['senderAd'] = $address;
     $result = curl_exec($ch); // get boolean result 
 	curl_close($ch);
 	$cap = json_decode($result, true);
-   
+    error_log(print_r($cap, true), 0);
    if ($result == 'true1') {
       echo 'Message Sent => +1'.$number;
    }else{
@@ -43,11 +41,6 @@ $fields['senderAd'] = $address;
 }else{
    echo '<span style="width: 100%;margin: 5px 0;color: #9c2a43;font-size: 15px;">Invalid Data</span>';
 }
-
-
-
-
-
 
 
 ?>

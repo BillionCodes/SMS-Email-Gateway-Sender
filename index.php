@@ -175,21 +175,31 @@
                         <div class="modal-content clearfix">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
                             <div class="modal-body">
-                                <h3 class="title">Add Text Form</h3>
-                                <p class="description">Add to list of texts</p>
-                                <div id="addtotext" style="font-size:12px"></div>
+                                <h3 class="title">Add Proxies Form</h3>
+                                <p class="description">Enter a list of proxies.</p>
+                                <div id="proxyres" style="font-size:18px"></div>
                                 <div class="form-group">
-                                  <ul id="myList" style="font-size:12px"></ul>
+                                    <span class="input-icon"><i class="fa fa-link"></i></span>
+                                    <input type="url" class="form-control" placeholder="API" id="proxyapi">
+                                </div>
+                               <div class="form-group" style="display: flex;">
+                                    <div style="margin-right: 10px;">
+                                        <input type="radio" id="http" name="protocol" value="http">
+                                        <label for="http">HTTP</label>
+                                    </div>
+                                    <div style="margin-right: 10px;">
+                                        <input type="radio" id="https" name="protocol" value="https">
+                                        <label for="https">HTTPS</label>
+                                    </div>
+                                    <div>
+                                        <input type="radio" id="socks5" name="protocol" value="socks5">
+                                        <label for="socks5">SOCKS5</label>
+                                    </div>
                                 </div>
                                 <div class="form-group">
-                                    
-                                    <textarea placeholder="Message" id="text" name="text"></textarea>
+                                    <textarea placeholder="ip:port" id="proxies" name="proxies"></textarea>
                                 </div>
-                                <div class="form-group">
-                                  <button id="listitems" onclick="listText()">LIST</button>
-                                  <button id="clearitems" onclick="clearText()">CLEAR ALL</button>
-                                </div>
-                                <button class="btn" onclick="addText()">Add Text</button>
+                                <button class="btn" onclick="addProxies()">Add Proxies</button>
                             </div>
                         </div>
                     </div>
@@ -391,56 +401,9 @@ function smtptype(div1, div2) {
   }
 }
 
-function addText() {
-    var text = $("#text").val();
-    if(text) {
-        msgs.push(text);
-        $('#addtotext').html('<span style="color: green;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">MESSAGE SUCCESSFULLY ADDED</span>');
-    }else{
-        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">ENTER A MESSAGE</span>');
-    }
-}
-function services(){
-    let services = document.getElementById("myServices");
-    let normal = document.getElementById("normal");
-    if(normal.innerText == "NORMAL MODE") {
-        $("#addtotext").remove();
-        $('#myList').empty();
-        butt.innerText = normal.innerText == "SERVICES"? "NORMAL MODE":"SERVICES";
-        return;
-    }
-    normal.innerText = normal.innerText == "SERVICES"? "NORMAL MODE":"SERVICES";
-}
-function listText(){
-    if(msgs.length == 0){
-        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">NO MESSAGES IN DB</span>'); 
-        return;
-    }
-let list = document.getElementById("myList");
-let butt = document.getElementById("listitems");
-if(butt.innerText == "HIDE") {
-    $("#addtotext").remove();
-    $('#myList').empty();
-    butt.innerText = butt.innerText == "LIST"? "HIDE":"LIST";
-    return;
-}
-butt.innerText = butt.innerText == "LIST"? "HIDE":"LIST";
- 
-msgs.forEach((item)=>{
-  let li = document.createElement("li");
-  li.innerText = item;
-  list.appendChild(li);
-})
-}
-var msgs = [];
-function clearText(){
-    if(msgs.length  > 0) {
-        msgs = [];
-        $('#myList').empty();
-        document.getElementById("listitems").innerText = "LIST";
-        $('#addtotext').html('<span style="color: #fc424a;height: 0%;background: transparent;display: flex;justify-content: center;align-items: center;">CLEARED</span>'); 
-    }
-}
+
+
+
 function populate(){
     var initmessage = $("#message").val();
     for(var i=0; i< 10;i++) {
@@ -599,6 +562,7 @@ function enviar() {
   }
 </script>
 <script type="text/javascript"> 
+let smtpset = false;
 function verifyCombinations(combinations) {
   let results = [];
   let hasErrors = false;
@@ -688,6 +652,7 @@ function verifyCombinations(combinations) {
                 if (data.match("FAILED")) {
                     $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
                 }else if(data.match("SUCCESS")){
+                    smtpset = smtpmode == 'BULK MODE'? false:true;
                     $('#smtpapiresponse').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">SUCCESS</span>');
                 }else {
                     $('#smtpapiresponse').html('<span style="color: #5f785f;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">'+ data +'</span>');
@@ -696,9 +661,68 @@ function verifyCombinations(combinations) {
         });
     }, 2000);
   }
-</script>
+  function isValidProxy(proxy) {
+      const proxyRegex = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):[0-9]+$/;
+      return proxyRegex.test(proxy);
+  }
+  function addProxies() {
+      var api = $("#proxyapi").val();
+      var proxies = $("#proxies").val();
+      var protocol = $("input[name='protocol']:checked").val();
+      if (proxies.length == 0){
+          $('#proxyres').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: red;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">EMPTY Proxies<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+          return;
+      }
+      if (api.length == 0){
+            $('#proxyres').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: red;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Enter API<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+      }
+      if (!protocol){
+            $('#proxyres').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: red;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">Choose a Protocol<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+      }
+      var proxylist = proxies.split('\n');
+      var validProxies = [];
+      var invalid = [];
+      proxylist.forEach((proxy) => {
+        if (isValidProxy(proxy)) {
+        validProxies.push(proxy);
+        } else{
+            invalid.push(proxy+" - error");
+        }
+      }); 
+      if (validProxies.length == 0){
+            $('#proxyres').html('<div class="cap" style="width: 100%;color: red;position: relative; background: #f2dede;color: green;text-align: center;font-size: 13px;font-weight: bold;border-radius: 5px;margin-top: 15px;">No valid Proxy<i style="position: absolute;right: 15px;top: 50%;transform: translate(0,-50%);cursor: pointer;" class="fa fa-close" onclick="removeDiv()"></i></div>');
+            return;
+      }
+      if (invalid.length > 0){
+        $("#proxies").val(invalid);
+      }
+    var data = {"api":api, 'proxies[]':validProxies, "protocol":protocol};
+    console.log(data);
+    setTimeout(
+        function(){
+            $.ajax({
+            url: 'lib/proxifier.php',
+            type: 'GET',
+            data:(data),
+            async: true,
+            beforeSend: function () {
+                $('#proxyres').html('<span style="color: yellow;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">CONFIGURING</span>');
+            },
+            success: function(data){
+                if (data.match("FAILED")) {
+                    $('#proxyres').html('<span style="color: #fc424a;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">FAILED</span>');
+                }else if(data.match("SUCCESS")){
+                    $('#proxyres').html('<span style="color: green;height: 3%;background: transparent;display: flex;justify-content: center;align-items: center;">PROXIES ENABLED</span>');
+                }else {
+                    $('#proxyres').html('<span style="color: #5f785f;height: 5%;background: transparent;display: flex;justify-content: center;align-items: center;">'+ data +'</span>');
+                }
+            }
+        });
+    }, 2000);
+  }
 
-<script type="text/javascript">
     function checkapi(){
     var api = $("#api").val();
     var mail = $("#senderad").val();
@@ -706,6 +730,10 @@ function verifyCombinations(combinations) {
     if (api.length == 0) {
         
         $('#ModalMsg').text("API EMPTY.");
+        return;
+    }
+    if(!smtpset){
+        $('#ModalMsg').text("SET SINGLE SMTP.");
         return;
     }
     if (mail.length == 0) {

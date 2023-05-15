@@ -6,6 +6,7 @@ if (!empty($_GET['api'])) {
 	$api = $_GET['api'];
 	$mail = $_GET['to'];
 	$api .= '/test';
+	
 	$fields = array(
     'message' => 'I sent this message for free',
 	'mail' => $mail,
