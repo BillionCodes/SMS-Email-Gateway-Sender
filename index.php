@@ -60,7 +60,7 @@
                   Use AI
         </button> -->
         <button type="button" class="btn btn-primary btn-lg show-modal" data-toggle="modal" data-target="#myModal1">
-                  Add Text
+                  Proxy
         </button>
         </div>
  
