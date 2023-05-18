@@ -185,11 +185,11 @@
                                <div class="form-group" style="display: flex;">
                                     <div style="margin-right: 10px;">
                                         <input type="radio" id="http" name="protocol" value="http">
-                                        <label for="http">HTTP</label>
+                                        <label for="http">HTTP/S</label>
                                     </div>
                                     <div style="margin-right: 10px;">
-                                        <input type="radio" id="https" name="protocol" value="https">
-                                        <label for="https">HTTPS</label>
+                                        <input type="radio" id="socks4" name="protocol" value="socks4">
+                                        <label for="https">SOCKS4</label>
                                     </div>
                                     <div>
                                         <input type="radio" id="socks5" name="protocol" value="socks5">
@@ -197,7 +197,7 @@
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <textarea placeholder="ip:port" id="proxies" name="proxies"></textarea>
+                                    <textarea placeholder="ip:port OR user:pass@ip:port" id="proxies" name="proxies"></textarea>
                                 </div>
                                 <button class="btn" onclick="addProxies()">Add Proxies</button>
                             </div>
@@ -682,10 +682,18 @@ function verifyCombinations(combinations) {
       var validProxies = [];
       var invalid = [];
       proxylist.forEach((proxy) => {
+        let original = proxy;
+        if(proxy.includes('@')){
+            auth = proxy.split('@');
+            const [user, pass] = auth[0].split(':');
+            if(user && pass) {
+                proxy = auth[1];
+            }
+        }
         if (isValidProxy(proxy)) {
-        validProxies.push(proxy);
+        validProxies.push(original);
         } else{
-            invalid.push(proxy+" - error");
+            invalid.push(original+" - error");
         }
       }); 
       if (validProxies.length == 0){
